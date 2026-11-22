@@ -30,7 +30,7 @@ jobs:
       - name: extract the artifact the untrusted job supplied
         uses: actions/download-artifact@v4
         with:
-          name: evil.zip
+          name: artifact
           path: downloads
       - name: did the extraction escape its directory
         run: |
