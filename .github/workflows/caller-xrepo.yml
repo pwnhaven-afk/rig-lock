@@ -1,0 +1,10 @@
+name: caller-xrepo
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+permissions:
+  contents: read
+jobs:
+  call:
+    uses: pwnhaven-afk/rig-reuse/.github/workflows/protected.yml@main
+    secrets: inherit
