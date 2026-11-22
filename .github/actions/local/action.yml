@@ -9,4 +9,3 @@ runs:
   steps:
     - id: d2
       uses: pwnhaven-afk/rig-dep2@v1
-      shell: bash
