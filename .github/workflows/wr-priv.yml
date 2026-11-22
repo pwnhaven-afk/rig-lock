@@ -1,0 +1,25 @@
+name: wr-priv
+on:
+  workflow_run:
+    workflows: ["wr-trigger"]
+    types: [completed]
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: event context
+        run: |
+          echo "WR_REF=${{ github.ref }}"
+          echo "WR_SHA=${{ github.sha }}"
+          echo "WR_TRIGGER_HEAD_SHA=${{ github.event.workflow_run.head_sha }}"
+          echo "WR_TRIGGER_HEAD_BRANCH=${{ github.event.workflow_run.head_branch }}"
+      - id: dep
+        uses: pwnhaven-afk/rig-dep@v1
+        with:
+          canary: ${{ secrets.CANARY }}
+      - name: report what executed
+        run: |
+          echo "WR_OUT_VERSION=${{ steps.dep.outputs.version }}"
+          echo "WR_OUT_CANARY_SHA=${{ steps.dep.outputs.canary_probe }}"
