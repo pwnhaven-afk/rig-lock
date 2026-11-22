@@ -1,0 +1,9 @@
+name: caller-pr
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+permissions:
+  contents: read
+jobs:
+  call:
+    uses: ./.github/workflows/callee2.yml
