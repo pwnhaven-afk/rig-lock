@@ -7,7 +7,7 @@ jobs:
   untrusted:
     runs-on: ubuntu-latest
     steps:
-      - name: build a crafted zip and upload it raw (archive: false) with v7
+      - name: "build a crafted zip and upload it raw with v7"
         run: |
           python3 - <<'PY'
           import zipfile
