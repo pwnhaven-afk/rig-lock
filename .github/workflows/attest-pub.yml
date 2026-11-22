@@ -1,0 +1,15 @@
+name: attest-pub
+on: workflow_dispatch
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
+jobs:
+  b:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "ATTEST-PUB-$(date -u +%s)" > canary.txt
+      - uses: actions/attest-build-provenance@v4.2.2
+        with:
+          subject-path: canary.txt
