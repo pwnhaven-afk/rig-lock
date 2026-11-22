@@ -1,0 +1,10 @@
+name: callee2
+on:
+  workflow_call:
+permissions:
+  contents: read
+jobs:
+  c:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "CALLEE2_RAN via event=${{ github.event_name }} actor=${{ github.actor }}"
