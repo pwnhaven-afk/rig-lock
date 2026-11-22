@@ -1,0 +1,19 @@
+name: lockfile-rig
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - id: dep
+        uses: pwnhaven-afk/rig-dep@v1
+        with:
+          canary: ${{ secrets.CANARY }}
+      - name: report what executed
+        run: |
+          echo "OUT_VERSION=${{ steps.dep.outputs.version }}"
+          echo "OUT_CANARY_SHA=${{ steps.dep.outputs.canary_probe }}"
