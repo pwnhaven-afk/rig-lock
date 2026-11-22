@@ -2,6 +2,7 @@ name: esc-oidc-caller
 on: workflow_dispatch
 permissions:
   contents: read
+  id-token: write
 jobs:
   call:
     uses: pwnhaven-afk/rig-reuse/.github/workflows/esc-oidc-callee.yml@main
