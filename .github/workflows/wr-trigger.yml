@@ -1,0 +1,11 @@
+name: wr-trigger
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+permissions:
+  contents: read
+jobs:
+  t:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "trigger run for ${{ github.event.pull_request.head.sha }}"
