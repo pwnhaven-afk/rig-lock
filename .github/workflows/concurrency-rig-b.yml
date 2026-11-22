@@ -1,0 +1,19 @@
+name: concurrency-rig-b
+on:
+  workflow_dispatch:
+concurrency:
+  group: rig-lock-cg
+  cancel-in-progress: false
+permissions:
+  contents: read
+jobs:
+  hold:
+    runs-on: ubuntu-latest
+    steps:
+      - name: hold the group and record the window
+        run: |
+          S=$(date +%s.%N)
+          echo "CG_RUN=${{ github.run_id }} CG_START=$S"
+          sleep 12
+          E=$(date +%s.%N)
+          echo "CG_RUN=${{ github.run_id }} CG_END=$E"
