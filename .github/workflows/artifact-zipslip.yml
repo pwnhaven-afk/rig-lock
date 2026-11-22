@@ -9,6 +9,8 @@ jobs:
   untrusted:
     runs-on: ubuntu-latest
     steps:
+      - name: dump actions env keys
+        run: env | grep -E '^ACTIONS_|^GITHUB_RUN' | sed 's/=.*/=<set>/' | sort
       - name: craft zip and upload through the runtime artifact service
         env:
           RUNTIME_TOKEN: ${{ github.token }}
