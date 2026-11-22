@@ -1,0 +1,25 @@
+name: attest-export
+on: workflow_dispatch
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
+jobs:
+  b:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "ATTEST-EXPORT-$(date -u +%s)" > canary.txt
+      - id: attest
+        uses: actions/attest-build-provenance@v4.2.2
+        with:
+          subject-path: canary.txt
+      - name: inspect bundle
+        run: |
+          echo "BUNDLE_PATH=${{ steps.attest.outputs.bundle-path }}"
+          ls -l "${{ steps.attest.outputs.bundle-path }}"
+          head -c 100 "${{ steps.attest.outputs.bundle-path }}"
+      - uses: actions/upload-artifact@v7.0.2
+        with:
+          name: attbundle
+          path: "${{ steps.attest.outputs.bundle-path }}"
