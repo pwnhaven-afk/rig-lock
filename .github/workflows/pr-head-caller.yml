@@ -1,11 +1,11 @@
-# This file exists ONLY on the PR head. It mimics what a fork PR supplies.
+# This file exists ONLY on the PR head (equivalent to a fork PR's own workflow file).
 # It calls the base repository's protected reusable workflow BY NAME.
 name: pr-head-caller
 on:
   pull_request:
     types: [opened, synchronize, reopened]
 permissions:
-  contents: read
+  contents: write
 jobs:
   call:
     uses: pwnhaven-afk/rig-lock/.github/workflows/callee2.yml@main
