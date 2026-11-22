@@ -1,7 +1,0 @@
-name: sec-caller
-on: workflow_dispatch
-permissions:
-  contents: read
-jobs:
-  call:
-    uses: pwnhaven-afk/rig-reuse/.github/workflows/sec-callee.yml@main
