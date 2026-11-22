@@ -1,0 +1,13 @@
+name: local-action-rig
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - id: loc
+        uses: ./.github/actions/local
+      - name: report
+        run: echo "LOCAL_OUT=${{ steps.loc.outputs.dep2 }}"
