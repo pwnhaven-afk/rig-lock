@@ -1,0 +1,20 @@
+name: az-min
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  untrusted:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "untrusted job ran"
+  victim:
+    needs: untrusted
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: zipslip-probe
+          path: downloads
+      - run: echo "victim job ran"

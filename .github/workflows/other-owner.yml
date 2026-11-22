@@ -1,0 +1,12 @@
+name: other-owner
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  a:
+    runs-on: ubuntu-latest
+    steps:
+      - id: slug
+        uses: rlespinasse/github-slug-action@v5
+      - run: echo "OTHER_OWNER_OUT=${{ env.GITHUB_REPOSITORY_SLUG || 'ran' }}"

@@ -5,12 +5,20 @@ version: 'v0.0.3'
 workflows:
     '.github/workflows/ci.yml':
         - 'pwnhaven-afk/rig-dep@v1'
+    '.github/workflows/local.yml':
+        - 'actions/checkout@v4.4.0'
     '.github/workflows/prt.yml':
         - 'pwnhaven-afk/rig-dep@v1'
+    '.github/workflows/scope.yml': []
     '.github/workflows/wr-priv.yml':
         - 'pwnhaven-afk/rig-dep@v1'
     '.github/workflows/wr-trigger.yml': []
 dependencies:
+    'actions/checkout@v4.4.0':
+        ref: 'v4.4.0'
+        commit: 'sha1-11d5960a326750d5838078e36cf38b85af677262'
+        owner_id: 44036562
+        repo_id: 197814629
     'pwnhaven-afk/rig-dep@v1':
         ref: 'v1'
         commit: 'sha1-8b108155d3dc82b24b7a17b7ef71c47f3081e26c'

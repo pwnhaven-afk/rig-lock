@@ -1,0 +1,12 @@
+name: policy-sha
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  a:
+    runs-on: ubuntu-latest
+    steps:
+      - id: d2
+        uses: pwnhaven-afk/rig-dep2@52c650abf418af1fd5fce4016506546585e49c8a
+      - run: echo "SHA_OUT=${{ steps.d2.outputs.version }}"

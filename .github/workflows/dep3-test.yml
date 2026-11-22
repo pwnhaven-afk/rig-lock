@@ -1,0 +1,12 @@
+name: dep3-test
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  a:
+    runs-on: ubuntu-latest
+    steps:
+      - id: d3
+        uses: pwnhaven-afk/rig-dep3@v1
+      - run: echo "DEP3_OUT=${{ steps.d3.outputs.marker }}"

@@ -1,0 +1,14 @@
+name: cache-write
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  w:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/cache@v4
+        with:
+          key: rig-cache-K1
+          path: restored.txt
+      - run: printf 'POISON-FROM-NON-DEFAULT-BRANCH' > restored.txt

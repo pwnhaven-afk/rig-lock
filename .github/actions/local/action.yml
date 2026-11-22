@@ -1,0 +1,11 @@
+name: local-composite
+description: local composite action that reaches an upstream action
+outputs:
+  dep2:
+    description: version of rig-dep2 that executed
+    value: ${{ steps.d2.outputs.version }}
+runs:
+  using: composite
+  steps:
+    - id: d2
+      uses: pwnhaven-afk/rig-dep2@v1
