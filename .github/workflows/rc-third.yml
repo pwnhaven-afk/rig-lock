@@ -1,0 +1,5 @@
+name: rc-third
+on: workflow_dispatch
+jobs:
+  call:
+    uses: electron/fiddle/.github/workflows/ci.yml@main
