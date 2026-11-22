@@ -1,9 +1,0 @@
-name: remote-callee-policy-test
-on: workflow_dispatch
-jobs:
-  gh-owned-callee:
-    uses: actions/reusable-workflows/.github/workflows/basic-validation.yml@main
-  third-party-callee:
-    uses: electron/fiddle/.github/workflows/ci.yml@main
-  same-owner-callee:
-    uses: pwnhaven-afk/rig-reuse/.github/workflows/protected.yml@main
