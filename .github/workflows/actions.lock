@@ -21,6 +21,6 @@ dependencies:
         repo_id: 197814629
     'pwnhaven-afk/rig-dep@v1':
         ref: 'v1'
-        commit: 'sha1-e8da18547517ab37eb3e846abb8333c685d3351c'
+        commit: 'sha1-8b108155d3dc82b24b7a17b7ef71c47f3081e26c'
         owner_id: 237112565
         repo_id: 1467780857
