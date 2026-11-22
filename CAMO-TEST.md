@@ -11,3 +11,15 @@
 ![redir-10](https://httpbin.org/redirect-to?url=http%3A%2F%2F10.0.0.1%2F)
 
 ![redir-ipv6](https://httpbin.org/redirect-to?url=http%3A%2F%2F%5B%3A%3A1%5D%3A80%2F)
+
+![dec](http://2130706433/)
+
+![hex](http://0x7f000001/)
+
+![short](http://127.1/)
+
+![v6mapped](http://[::ffff:127.0.0.1]/)
+
+![nip](http://127.0.0.1.nip.io/)
+
+![localtest](http://localtest.me/)
