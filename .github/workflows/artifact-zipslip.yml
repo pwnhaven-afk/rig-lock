@@ -19,6 +19,7 @@ jobs:
           PY
       - uses: actions/upload-artifact@v4
         with:
+          name: evil.zip
           path: evil.zip
           archive: false
 
@@ -30,7 +31,7 @@ jobs:
       - name: extract the artifact the untrusted job supplied
         uses: actions/download-artifact@v4
         with:
-          name: artifact
+          name: evil.zip
           path: downloads
       - name: did the extraction escape its directory
         run: |
