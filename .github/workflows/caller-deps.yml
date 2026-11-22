@@ -1,5 +1,0 @@
-name: caller-deps
-on: workflow_dispatch
-jobs:
-  call:
-    uses: pwnhaven-afk/rig-reuse/.github/workflows/callee-deps.yml@main
