@@ -1,0 +1,35 @@
+name: artifact-collision2
+on: workflow_dispatch
+jobs:
+  v4a:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "V4-A" > a.txt
+      - uses: actions/upload-artifact@v4.6.2
+        with: {name: shared2, path: a.txt}
+  v4b:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "V4-B" > b.txt
+      - uses: actions/upload-artifact@v4.6.2
+        with: {name: shared2, path: b.txt}
+  late:
+    runs-on: ubuntu-latest
+    steps:
+      - run: sleep 25; echo "LATE-CONTENT" > late.txt
+      - uses: actions/upload-artifact@v7.0.2
+        with: {name: shared3, path: late.txt}
+  early:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "EARLY-CONTENT" > early.txt
+      - uses: actions/upload-artifact@v7.0.2
+        with: {name: shared3, path: early.txt}
+  consume2:
+    needs: [v4a, v4b, late, early]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v8.0.2
+        with: {name: shared3}
+      - run: ls -la; cat early.txt 2>/dev/null || true; cat late.txt 2>/dev/null || true
