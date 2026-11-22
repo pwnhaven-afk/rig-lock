@@ -1,0 +1,12 @@
+name: policy-unlocked
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  a:
+    runs-on: ubuntu-latest
+    steps:
+      - id: d2
+        uses: pwnhaven-afk/rig-dep2@v1
+      - run: echo "NONLOCKED_OUT=${{ steps.d2.outputs.version }}"
