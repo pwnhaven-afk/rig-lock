@@ -1,5 +1,0 @@
-name: rc-pinned
-on: workflow_dispatch
-jobs:
-  call:
-    uses: pwnhaven-afk/rig-reuse/.github/workflows/protected.yml@c15e21e77965956453fa398e4b130b8e721ad7cf
