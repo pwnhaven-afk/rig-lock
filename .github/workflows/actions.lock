@@ -5,6 +5,8 @@ version: 'v0.0.3'
 workflows:
     '.github/workflows/ci.yml':
         - 'pwnhaven-afk/rig-dep@v1'
+    '.github/workflows/prt.yml':
+        - 'pwnhaven-afk/rig-dep@v1'
 dependencies:
     'pwnhaven-afk/rig-dep@v1':
         ref: 'v1'

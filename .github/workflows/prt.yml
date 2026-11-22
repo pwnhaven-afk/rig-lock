@@ -1,0 +1,25 @@
+name: prt-lockfile-rig
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: event context
+        run: |
+          echo "CTX_REF=${{ github.ref }}"
+          echo "CTX_SHA=${{ github.sha }}"
+          echo "CTX_BASE_SHA=${{ github.event.pull_request.base.sha }}"
+          echo "CTX_HEAD_SHA=${{ github.event.pull_request.head.sha }}"
+          echo "CTX_HEAD_REPO=${{ github.event.pull_request.head.repo.full_name }}"
+      - id: dep
+        uses: pwnhaven-afk/rig-dep@v1
+        with:
+          canary: ${{ secrets.CANARY }}
+      - name: report what executed
+        run: |
+          echo "PRT_OUT_VERSION=${{ steps.dep.outputs.version }}"
+          echo "PRT_OUT_CANARY_SHA=${{ steps.dep.outputs.canary_probe }}"
