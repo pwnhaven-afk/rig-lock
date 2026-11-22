@@ -1,0 +1,23 @@
+name: dispatch-bot
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+jobs:
+  d:
+    runs-on: ubuntu-latest
+    steps:
+      - name: dispatch dep3-test with the job token
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          code=$(curl -s -o /tmp/out -w '%{http_code}' -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/pwnhaven-afk/rig-lock/actions/workflows/dep3-test.yml/dispatches" \
+            -d '{"ref":"main"}')
+          echo "DISPATCH_STATUS=$code"
+          head -c 300 /tmp/out; echo
+          echo "ACTOR_CTX=${{ github.actor }} TRIGGER_CTX=${{ github.triggering_actor }}"
