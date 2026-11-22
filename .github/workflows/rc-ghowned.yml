@@ -1,0 +1,5 @@
+name: rc-ghowned
+on: workflow_dispatch
+jobs:
+  call:
+    uses: actions/reusable-workflows/.github/workflows/basic-validation.yml@main
