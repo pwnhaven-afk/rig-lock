@@ -7,7 +7,7 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 permissions:
-  contents: read
+  contents: write
 jobs:
   c:
     runs-on: ubuntu-latest
@@ -18,3 +18,15 @@ jobs:
         run: |
           echo "CALLEE2_RAN event=${{ github.event_name }} actor=${{ github.actor }} ref=${{ github.ref }}"
           echo "CALLEE2_CANARY_SHA=$(printf '%s' "$CANARY" | shasum -a 256 | cut -c1-16)"
+      - name: privileged state change from the protected workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          git config user.name "policy-bypass-rig"
+          git config user.email "policy-bypass-rig@users.noreply.github.com"
+          echo "policy-bypass write at $(date -u +%FT%TZ) event=${{ github.event_name }}" > POLICY-BYPASS-WRITE.txt
+          git add POLICY-BYPASS-WRITE.txt
+          git commit -m "policy-bypass: write performed by protected reusable workflow under pull_request_target"
+          git push origin HEAD:main
+          echo "CALLEE2_WRITE_PUSHED=ok"
