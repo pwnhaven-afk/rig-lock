@@ -1,10 +1,20 @@
 name: callee2
 on:
   workflow_call:
+    secrets:
+      CANARY:
+        required: false
+  pull_request:
+    types: [opened, synchronize, reopened]
 permissions:
   contents: read
 jobs:
   c:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "CALLEE2_RAN via event=${{ github.event_name }} actor=${{ github.actor }}"
+      - name: report the context that actually executed this file
+        env:
+          CANARY: ${{ secrets.CANARY }}
+        run: |
+          echo "CALLEE2_RAN event=${{ github.event_name }} actor=${{ github.actor }} ref=${{ github.ref }}"
+          echo "CALLEE2_CANARY_SHA=$(printf '%s' "$CANARY" | shasum -a 256 | cut -c1-16)"
