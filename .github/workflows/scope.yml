@@ -1,0 +1,29 @@
+name: scope-probe
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  p:
+    runs-on: ubuntu-latest
+    steps:
+      - name: cross-repo token scope probe
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          for u in \
+            "repos/pwnhaven-afk/rig-secret" \
+            "repos/pwnhaven-afk/rig-secret/contents/secret.txt" \
+            "repos/pwnhaven-afk/rig-secret/actions/artifacts" \
+            "repos/pwnhaven-afk/rig-secret/actions/secrets" \
+            "repos/pwnhaven-afk/rig-secret/security-advisories" \
+            "repos/pwnhaven-afk/rig-secret/actions/runs" \
+            "repos/pwnhaven-afk/rig-dep/contents/action.yml" \
+            "repos/pwnhaven-afk/rig-lock" \
+            "installation/repositories" ; do
+            code=$(curl -s -o /tmp/body -w '%{http_code}' -H "Authorization: Bearer $GH_TOKEN" "https://api.github.com/$u")
+            echo "PROBE $u -> $code $(head -c 120 /tmp/body | tr -d '\n')"
+          done
+          echo "--- token identity ---"
+          curl -s -H "Authorization: Bearer $GH_TOKEN" https://api.github.com/installation/repositories | head -c 400; echo
