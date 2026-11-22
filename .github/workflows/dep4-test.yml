@@ -1,0 +1,12 @@
+name: dep4-test
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  a:
+    runs-on: ubuntu-latest
+    steps:
+      - id: d4
+        uses: pwnhaven-afk/rig-dep4@v1
+      - run: echo "DEP4_OUT=${{ steps.d4.outputs.marker }}"
