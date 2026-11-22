@@ -1,0 +1,6 @@
+name: env-caller
+on: workflow_dispatch
+jobs:
+  call:
+    environment: gated
+    uses: pwnhaven-afk/rig-reuse/.github/workflows/env-callee.yml@main
