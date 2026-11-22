@@ -1,7 +1,0 @@
-name: esc-caller
-on: workflow_dispatch
-permissions:
-  contents: write
-jobs:
-  call:
-    uses: pwnhaven-afk/rig-reuse/.github/workflows/esc-callee.yml@main
