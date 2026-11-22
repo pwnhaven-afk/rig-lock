@@ -1,8 +1,0 @@
-name: direct-deps
-on: workflow_dispatch
-jobs:
-  p:
-    runs-on: ubuntu-latest
-    steps:
-      - name: gh-owned action directly
-        uses: actions/checkout@v4
