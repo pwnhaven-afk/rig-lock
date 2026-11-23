@@ -1,0 +1,38 @@
+name: ref policy probe
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: git ref to check out in the protected job
+        required: true
+        default: main
+        type: string
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.out.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: false
+      - id: out
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+  publish:
+    runs-on: ubuntu-latest
+    needs: check
+    environment: envprobe-ref
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.check.outputs.sha }}
+          persist-credentials: false
+      - name: Show refs and canary
+        run: |
+          echo "dispatch_ref=$GITHUB_REF"
+          echo "dispatch_sha=$GITHUB_SHA"
+          echo "checked_out_sha=$(git rev-parse HEAD)"
+          echo "canary:"; cat canary.txt 2>/dev/null || echo "(no canary on this ref)"
