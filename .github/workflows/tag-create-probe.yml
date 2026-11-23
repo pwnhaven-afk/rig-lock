@@ -1,0 +1,17 @@
+name: tag create via workflow token
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: create release with NEW tag using GITHUB_TOKEN
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -x
+          gh api -X POST repos/pwnhaven-afk/rig-lock/releases \
+            -f tag_name="v0.0.3-blume-probe" -f name="probe3" -f target_commitish=main 2>&1 | head -20
+          echo "EXIT=$?"
