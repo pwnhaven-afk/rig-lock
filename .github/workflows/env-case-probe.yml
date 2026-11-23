@@ -1,0 +1,16 @@
+name: env case probe
+on:
+  workflow_dispatch:
+  pull_request:
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    environment: envtest
+    steps:
+      - name: env ok
+        run: |
+          echo "ENV_GATE=PASSED ref=$GITHUB_REF event=$GITHUB_EVENT_NAME"
+          echo "oidc_url=$([ -n "${ACTIONS_ID_TOKEN_REQUEST_URL:-}" ] && echo yes || echo no)"
