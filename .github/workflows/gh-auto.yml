@@ -18,5 +18,5 @@ jobs:
           PR: ${{ inputs.pr }}
         run: |
           echo "actor: $(gh api user -q .login)"
-          gh pr review "$PR" --approve && echo APPROVE_OK || echo APPROVE_FAIL
-          gh pr merge "$PR" --auto --squash && echo AUTOMERGE_OK || echo AUTOMERGE_FAIL
+          gh pr review -R pwnhaven-afk/rig-lock "$PR" --approve && echo APPROVE_OK || echo APPROVE_FAIL
+          gh pr merge -R pwnhaven-afk/rig-lock "$PR" --auto --squash && echo AUTOMERGE_OK || echo AUTOMERGE_FAIL
