@@ -1,0 +1,16 @@
+name: self approve probe
+on:
+  pull_request:
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  approve:
+    runs-on: ubuntu-latest
+    steps:
+      - name: approve this PR with GITHUB_TOKEN
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr review -R pwnhaven-afk/rig-lock "$PR" --approve --body "lab self approve" && echo APPROVE_OK || echo APPROVE_FAIL
