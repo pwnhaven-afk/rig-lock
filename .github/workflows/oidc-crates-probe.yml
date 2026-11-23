@@ -10,7 +10,7 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    environment: prod
+    environment: prod-branchpolicy
     steps:
       - name: Claims and exchange
         run: |
