@@ -1,0 +1,16 @@
+name: mg probe
+on:
+  merge_group:
+  pull_request:
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: presence
+        run: |
+          echo "event=$GITHUB_EVENT_NAME ref=$GITHUB_REF"
+          if [ -n "${ACTIONS_ID_TOKEN_REQUEST_URL:-}" ]; then echo "OIDC_CHANNEL=present"; else echo "OIDC_CHANNEL=absent"; fi
+          if [ -n "${ACTIONS_ID_TOKEN_REQUEST_TOKEN:-}" ]; then echo "OIDC_RTOKEN=present"; else echo "OIDC_RTOKEN=absent"; fi
