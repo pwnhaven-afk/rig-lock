@@ -21,5 +21,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+      - name: make stub executable (lab plumbing only)
+        run: chmod +x packages/build-scripts/tag-release-manually.ts
       - name: Tag Release Manually (exact pattern from anza-xyz/kit)
         run: ./packages/build-scripts/tag-release-manually.ts --version '${{ github.event.inputs.version }}' --tag '${{ github.event.inputs.tag }}'
