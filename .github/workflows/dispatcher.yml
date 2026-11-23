@@ -1,0 +1,19 @@
+name: dispatcher probe
+on:
+  pull_request:
+permissions:
+  contents: read
+  actions: write
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch dispatch-probe on main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -x
+          gh --version || true
+          gh workflow run dispatch-probe.yml --repo "$GITHUB_REPOSITORY" --ref main -f x=from-same-repo-pr
+          sleep 10
+          gh run list --repo "$GITHUB_REPOSITORY" --workflow dispatch-probe.yml --limit 3
