@@ -1,0 +1,16 @@
+name: dispatch probe
+on:
+  workflow_dispatch:
+    inputs:
+      x:
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "PROBE_INPUT=${{ inputs.x }}"
+          echo "PROBE_EVENT=$GITHUB_EVENT_NAME ref=$GITHUB_REF"
