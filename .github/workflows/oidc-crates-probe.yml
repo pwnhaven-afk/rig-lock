@@ -14,13 +14,12 @@ jobs:
     steps:
       - name: Claims and exchange
         run: |
-          echo "event_name=$GITHUB_EVENT_NAME"
-          echo "ref=$GITHUB_REF"
-          echo "head_ref=${GITHUB_HEAD_REF:-<none>}"
-          echo "base_ref=${GITHUB_BASE_REF:-<none>}"
+          echo "event_name=$GITHUB_EVENT_NAME ref=$GITHUB_REF"
           curl -sS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=crates.io" -o /tmp/oidc.json
-          python3 -c "import json;d=json.load(open('/tmp/oidc.json'));open('/tmp/tok','w').write(d.get('value',''));print('got_token', bool(d.get('value')), d.get('error_description',''))"
-          python3 -c "import base64,json;t=open('/tmp/tok').read().strip();p=t.split('.')[1];p+='='*(-len(p)%4);c=json.loads(base64.urlsafe_b64decode(p));print('\n'.join('  %s = %s'%(k,c.get(k)) for k in ['iss','aud','event_name','ref','ref_type','repository','repository_owner_id','workflow_ref','environment','sub']))"
-          CODE=$(curl -sS -o /tmp/resp.txt -w '%{http_code}' -X POST "https://crates.io/api/v1/trusted_publishing/tokens" -H "Content-Type: application/json" -d "{\"jwt\":\"$(cat /tmp/tok)\"}")
-          echo "--- exchange HTTP $CODE ---"
-          cat /tmp/resp.txt
+          python3 -c "import json;d=json.load(open('/tmp/oidc.json'));open('/tmp/tok','w').write(d.get('value',''));print('got_token', bool(d.get('value')))"
+          echo "--- crates.io exchange ---"
+          curl -sS -D /tmp/hdr.txt -o /tmp/resp.txt -w 'HTTP %{http_code}\n' -X POST "https://crates.io/api/v1/trusted_publishing/tokens" \
+            -H "Content-Type: application/json" -H "User-Agent: blume-research (security test)" \
+            -d "{\"jwt\":\"$(cat /tmp/tok)\"}"
+          echo "--- body ---"; cat /tmp/resp.txt; echo
+          grep -iE '^(x-|cf-|server|content-type)' /tmp/hdr.txt | head -8
