@@ -12,6 +12,6 @@ jobs:
         run: |
           RESP=$(curl -sS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=lab")
           JWT=$(printf '%s' "$RESP" | jq -r .value)
-          P=$(printf '%s' "$JWT" | cut -d. -f2 | tr '_- ' '/+'); PAD=$(( (4 - ${#P} % 4) % 4 )); P="$P$(printf '=%.0s' $(seq 1 $PAD))"
+          P=$(printf '%s' "$JWT" | cut -d. -f2 | tr '_-' '/+'); PAD=$(( (4 - ${#P} % 4) % 4 )); P="$P$(printf '=%.0s' $(seq 1 $PAD))"
           echo "jwt_len=${#JWT} payload_len=${#P}"
           printf '%s' "$P" | base64 -d 2>/dev/null | jq '{workflow_ref, job_workflow_ref, event_name, ref, sub}'
